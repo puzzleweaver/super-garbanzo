@@ -5,13 +5,16 @@ Contributor:
     Austin Weaver, weave112@purdue.edu
 
 Name:
-    TBD
+    super-garbanzo (final name TBD)
 
 Description:
     A multiplayer block-pushing game.
 
 Tools:
-    Heroku for hosting (server)
-    MongoDB for user account database (server)
-    Node.js for real-time communication (server)
-    WebGL for graphics (client)
+<ul>
+    <li>Heroku, for hosting (server) </li>
+    <li>MongoDB, for user account database (server)</li>
+    <li>Node.js,  (server)</li>
+    <li>Express, for handling http in js (server)</li>
+    <li>WebGL, for 3d graphics (client)</li>
+</ul>
