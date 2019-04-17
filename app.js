@@ -24,6 +24,8 @@ for (var i = 0; i < BOARD_WIDTH; i++) {
     board.push([]);
     for (var j = 0; j < BOARD_HEIGHT; j++) {
         board[i].push(Math.random() < 0.9 ? -1 : 0);
+        if(j == 8)
+            board[i][j] = 0;
     }
 }
 boardDeltas = [];
@@ -103,11 +105,11 @@ function move(x0, y0, x, y, dx, dy, pid) {
     if (board[nx][ny] != 0 && board[nx][ny] != pid && board[nx][ny] != -1)
         return false;
     if (nx == x0 && ny == y0)
-        ret = -1;
-    else if (board[nx][ny] != -1) {
+        return -1;
+    if (board[nx][ny] != -1)
         ret = move(x0, y0, nx, ny, dx, dy, pid);
-    }
-    if (ret != false) setBoard(nx, ny, board[x][y], pid);
+    if (ret != false)
+        setBoard(nx, ny, board[x][y], pid);
     return ret;
 }
 
@@ -116,14 +118,16 @@ setInterval(function() {
         var player = player_list[i];
         if (player.time <= 0) {
             var ret = move(player.x, player.y, player.x, player.y,
-                    player.dx, player.dy, player.id);
+                    player.dx, player.dy, i);
             if(ret != false) {
-                setBoard(player.x, player.y, -1, undefined);
+                if(ret != -1)
+                    setBoard(player.x, player.y, -1, undefined);
+                else
+                    setBoard(player.x, player.y,
+                        board[(player.x - player.dx + BOARD_WIDTH) % BOARD_WIDTH]
+                        [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT], i);
                 player.lx = player.x;
                 player.ly = player.y;
-                if(ret == -1) {
-                    console.log("loops :3");
-                }
                 player.x = (player.x + player.dx + BOARD_WIDTH) % BOARD_WIDTH;
                 player.y = (player.y + player.dy + BOARD_WIDTH) % BOARD_WIDTH;
                 player.time = tick - subtick;
