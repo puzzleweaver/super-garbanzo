@@ -1,6 +1,6 @@
 // js code for setting up communications with the server and starting the game
 
-var socket = io.connect('http://localhost:2000');
+var socket = io.connect('http://localhost:5000');
 var id, tick;
 var began = false;
 var inputX = 0,
