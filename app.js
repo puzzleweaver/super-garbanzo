@@ -93,8 +93,8 @@ function setBoard(x, y, to, id) {
     }
 }
 
-function move(x0, y0, x, y, dx, dy, pid) {
-    if(x == x0 && y == y0)
+function move(x0, y0, x, y, dx, dy, pid, loop) {
+    if(loop && x == x0 && y == y0)
         return true;
     if (dx == 0 && dy == 0)
         return false;
@@ -103,7 +103,7 @@ function move(x0, y0, x, y, dx, dy, pid) {
     if (board[nx][ny] != 0 && board[nx][ny] != pid && board[nx][ny] != -1)
         return false;
     if (board[nx][ny] != -1) {
-        ret = move(x0, y0, nx, ny, dx, dy, pid);
+        ret = move(x0, y0, nx, ny, dx, dy, pid, true);
     }
     if (ret) setBoard(nx, ny, board[x][y], pid);
     return ret;
@@ -113,7 +113,8 @@ setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
         if (player.time <= 0) {
-            if (move(player.x, player.y, player.x, player.y, player.dx, player.dy, player.id)) {
+            if (move(player.x, player.y, player.x, player.y,
+                    player.dx, player.dy, player.id, false)) {
                 setBoard(player.x, player.y, -1, undefined);
                 player.lx = player.x;
                 player.ly = player.y;
