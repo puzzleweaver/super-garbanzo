@@ -93,19 +93,21 @@ function setBoard(x, y, to, id) {
     }
 }
 
-function move(x0, y0, x, y, dx, dy, pid, loop) {
-    if(loop && x == x0 && y == y0)
-        return true;
+// returns false for unable to move, true for able to move, and -1 for loops
+function move(x0, y0, x, y, dx, dy, pid) {
     if (dx == 0 && dy == 0)
         return false;
     var ret = true;
-    var nx = (x+dx+BOARD_WIDTH)%BOARD_WIDTH, ny = (y+dy+BOARD_HEIGHT)%BOARD_HEIGHT;
+    var nx = (x + dx + BOARD_WIDTH) % BOARD_WIDTH,
+        ny = (y + dy + BOARD_HEIGHT) % BOARD_HEIGHT;
     if (board[nx][ny] != 0 && board[nx][ny] != pid && board[nx][ny] != -1)
         return false;
-    if (board[nx][ny] != -1) {
-        ret = move(x0, y0, nx, ny, dx, dy, pid, true);
+    if (nx == x0 && ny == y0)
+        ret = -1;
+    else if (board[nx][ny] != -1) {
+        ret = move(x0, y0, nx, ny, dx, dy, pid);
     }
-    if (ret) setBoard(nx, ny, board[x][y], pid);
+    if (ret != false) setBoard(nx, ny, board[x][y], pid);
     return ret;
 }
 
@@ -113,13 +115,17 @@ setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
         if (player.time <= 0) {
-            if (move(player.x, player.y, player.x, player.y,
-                    player.dx, player.dy, player.id, false)) {
+            var ret = move(player.x, player.y, player.x, player.y,
+                    player.dx, player.dy, player.id);
+            if(ret != false) {
                 setBoard(player.x, player.y, -1, undefined);
                 player.lx = player.x;
                 player.ly = player.y;
-                player.x = (player.x+player.dx+BOARD_WIDTH)%BOARD_WIDTH;
-                player.y = (player.y+player.dy+BOARD_WIDTH)%BOARD_WIDTH;
+                if(ret == -1) {
+                    console.log("loops :3");
+                }
+                player.x = (player.x + player.dx + BOARD_WIDTH) % BOARD_WIDTH;
+                player.y = (player.y + player.dy + BOARD_WIDTH) % BOARD_WIDTH;
                 player.time = tick - subtick;
             }
         } else
