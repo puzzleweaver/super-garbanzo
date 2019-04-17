@@ -117,6 +117,8 @@ setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
         if (player.time <= 0) {
+            var loop_box = board[(player.x - player.dx + BOARD_WIDTH) % BOARD_WIDTH]
+                    [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT];
             var ret = move(player.x, player.y, player.x, player.y,
                     player.dx, player.dy, i);
             if(ret != false) {
@@ -124,8 +126,7 @@ setInterval(function() {
                     setBoard(player.x, player.y, -1, undefined);
                 else
                     setBoard(player.x, player.y,
-                        board[(player.x - player.dx + BOARD_WIDTH) % BOARD_WIDTH]
-                        [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT], i);
+                        loop_box, i);
                 player.lx = player.x;
                 player.ly = player.y;
                 player.x = (player.x + player.dx + BOARD_WIDTH) % BOARD_WIDTH;
