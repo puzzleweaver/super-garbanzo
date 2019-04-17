@@ -113,7 +113,7 @@ setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
         if (player.time <= 0) {
-            if (move(player.x, player.y, player.dx, player.dy, player.id)) {
+            if (move(player.x, player.y, player.x, player.y, player.dx, player.dy, player.id)) {
                 setBoard(player.x, player.y, -1, undefined);
                 player.lx = player.x;
                 player.ly = player.y;
