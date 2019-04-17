@@ -41,6 +41,11 @@ io.on('connection', function(socket) {
             height: BOARD_HEIGHT,
         });
     });
+    socket.on('dir-input', function(data) {
+        var p = player_list[socket.id];
+        p.dx = data.dx;
+        p.dy = data.dy;
+    })
 
 });
 
@@ -49,14 +54,14 @@ var time = 0;
 
 setInterval(function() {
     time += subtick;
-    if(time >= tick) {
+    // if(time >= tick) {
         time = 0;
         for(var i in player_list) {
             var player = player_list[i];
             player.x += player.dx;
             player.y += player.dy;
         }
-    }
+    // }
 
     var px = [], py = [], pid = [];
     for(var i in player_list) {
