@@ -36,7 +36,7 @@ function draw() {
                 ctx.strokeStyle = 'white';
             else if (board[i][j] == -1)
                 continue;
-            else
+            else if(ps[board[i][j]] != undefined)
                 ctx.strokeStyle = 'hsl(' + ps[board[i][j]].color*360 + ', 100%, 50%)';
             var ba = boardAssoc[i][j];
             if (ba == undefined || ps[ba] == undefined) {
