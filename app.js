@@ -93,7 +93,9 @@ function setBoard(x, y, to, id) {
     }
 }
 
-function move(x, y, dx, dy, pid) {
+function move(x0, y0, x, y, dx, dy, pid) {
+    if(x == x0 && y == y0)
+        return true;
     if (dx == 0 && dy == 0)
         return false;
     var ret = true;
@@ -101,7 +103,7 @@ function move(x, y, dx, dy, pid) {
     if (board[nx][ny] != 0 && board[nx][ny] != pid && board[nx][ny] != -1)
         return false;
     if (board[nx][ny] != -1) {
-        ret = move(nx, ny, dx, dy, pid);
+        ret = move(x0, y0, nx, ny, dx, dy, pid);
     }
     if (ret) setBoard(nx, ny, board[x][y], pid);
     return ret;
