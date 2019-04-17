@@ -1,20 +1,19 @@
 {
   "name": "super-garbanzo",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "An online multiplayer box-pushing game.",
   "engines": {
     "node": "10.x"
   },
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app"
   },
   "dependencies": {
-    "express": "^4.15.2",
-    "socket.io": "0.8.5"
+    "express": "^4.0.0",
+    "socket.io": "^2.2.0"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/puzzleweaver/super-garbanzo"
