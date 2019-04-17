@@ -1,4 +1,4 @@
-var Player = function(ID, X, Y) {
+var Player = function(ID, X, Y, COLOR) {
     var self = {
         id: ID,
         name: "",
@@ -8,6 +8,7 @@ var Player = function(ID, X, Y) {
         dy: 0,
         lx: X,
         ly: Y,
+        color: COLOR,
         time: 0,
     }
     return self;

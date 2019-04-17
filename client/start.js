@@ -1,19 +1,13 @@
 // js code for setting up communications with the server and starting the game
 
-var socket = io.connect('https://super-garbanzo.herokuapp.com/');
+var socket = io.connect('localhost:80');//'https://super-garbanzo.herokuapp.com/');
+console.log(socket);
 var id, tick;
 var began = false;
 var inputX = 0,
     inputY = 0;
 var board, BOARD_WIDTH, BOARD_HEIGHT;
 var boardAssoc;
-
-btn = document.getElementById('btn');
-btn.addEventListener('click', function() {
-    socket.emit('client-message', {
-        message: 'hello server.\nfrom, client'
-    });
-});
 
 socket.on('id', function(data) {
     id = data.id;

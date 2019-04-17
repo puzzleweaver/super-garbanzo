@@ -18,8 +18,8 @@ var io = socket(serv);
 var socket_list = {};
 var player_list = {};
 var board = [],
-    BOARD_WIDTH = 100,
-    BOARD_HEIGHT = 100;
+    BOARD_WIDTH = 20,
+    BOARD_HEIGHT = 20;
 for (var i = 0; i < BOARD_WIDTH; i++) {
     board.push([]);
     for (var j = 0; j < BOARD_HEIGHT; j++) {
@@ -27,6 +27,11 @@ for (var i = 0; i < BOARD_WIDTH; i++) {
     }
 }
 boardDeltas = [];
+
+function exit_game(id) {
+    board[player_list[id].x][player_list[id].y] = -1;
+    delete player_list[id];
+}
 
 io.on('connection', function(socket) {
 
@@ -38,9 +43,10 @@ io.on('connection', function(socket) {
 
     socket.on('start', function(data) {
         player_list[data.id] = new player(data.id,
-            Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT));
+            Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT),
+            Math.random());
         board[player_list[data.id].x][player_list[data.id].y] = data.id;
-        board[player_list[data.id].x][player_list[data.id].y] = data.id + 1;
+    board[player_list[data.id].x][player_list[data.id].y+1] = data.id;
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
@@ -55,6 +61,17 @@ io.on('connection', function(socket) {
         p.dx = data.dx;
         p.dy = data.dy;
     })
+
+    socket.on('gameover', function(data) {
+        exit_game(socket.id);
+    });
+
+    socket.on('disconnect', function(data) {
+        if(player_list[socket.id] != undefined) {
+            console.log(socket.id, "disconnected.");
+            exit_game(socket.id);
+        }
+    });
 
 });
 
@@ -112,6 +129,7 @@ setInterval(function() {
             lx: player_list[i].lx,
             ly: player_list[i].ly,
             t: player_list[i].time,
+            color: player_list[i].color,
         };
     }
 
