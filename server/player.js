@@ -8,6 +8,8 @@ var Player = function(ID, X, Y, COLOR) {
         dy: 0,
         lx: X,
         ly: Y,
+        bx: X,
+        by: Y+1,
         color: COLOR,
         time: 0,
     }

@@ -30,6 +30,7 @@ boardDeltas = [];
 
 function exit_game(id) {
     board[player_list[id].x][player_list[id].y] = -1;
+    board[player_list[id].bx][player_list[id].by] = -1;
     delete player_list[id];
 }
 
@@ -43,10 +44,10 @@ io.on('connection', function(socket) {
 
     socket.on('start', function(data) {
         player_list[data.id] = new player(data.id,
-            Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT),
+            Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * (BOARD_HEIGHT - 1)),
             Math.random());
         board[player_list[data.id].x][player_list[data.id].y] = data.id;
-    board[player_list[data.id].x][player_list[data.id].y+1] = data.id;
+        board[player_list[data.id].x][player_list[data.id].y + 1] = data.id;
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
@@ -67,7 +68,7 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        if(player_list[socket.id] != undefined) {
+        if (player_list[socket.id] != undefined) {
             console.log(socket.id, "disconnected.");
             exit_game(socket.id);
         }
@@ -86,18 +87,22 @@ function setBoard(x, y, to, id) {
         id: id,
     });
     board[x][y] = to;
+    if(player_list[to] != undefined) {
+        player_list[to].bx = x;
+        player_list[to].by = y;
+    }
 }
 
 function move(x, y, dx, dy, pid) {
     if ((dx == 0 && dy == 0) || x + dx < 0 || x + dx >= BOARD_WIDTH || y + dy < 0 || y + dy >= BOARD_HEIGHT)
         return false;
     var ret = true;
-    if(board[x+dx][y+dy] != 0 && board[x+dx][y+dy] != pid && board[x+dx][y+dy] != -1)
+    if (board[x + dx][y + dy] != 0 && board[x + dx][y + dy] != pid && board[x + dx][y + dy] != -1)
         return false;
     if (board[x + dx][y + dy] != -1) {
         ret = move(x + dx, y + dy, dx, dy, pid);
     }
-    if(ret) setBoard(x + dx, y + dy, board[x][y], pid);
+    if (ret) setBoard(x + dx, y + dy, board[x][y], pid);
     return ret;
 }
 
@@ -109,13 +114,13 @@ setInterval(function() {
         if (player.y + player.dy < 0 || player.y + player.dy >= BOARD_HEIGHT)
             player.dy = 0;
         if (player.time <= 0) {
-            if(move(player.x, player.y, player.dx, player.dy, player.id)) {
+            if (move(player.x, player.y, player.dx, player.dy, player.id)) {
                 setBoard(player.x, player.y, -1, undefined);
                 player.lx = player.x;
                 player.ly = player.y;
                 player.x += player.dx;
                 player.y += player.dy;
-                player.time = tick-subtick;
+                player.time = tick - subtick;
             }
         } else
             player.time -= subtick;
