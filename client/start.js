@@ -5,6 +5,8 @@ var id;
 var began = false;
 var inputX = 0,
     inputY = 0;
+var board, BOARD_WIDTH, BOARD_HEIGHT;
+var boardAssoc = {};
 
 btn = document.getElementById('btn');
 btn.addEventListener('click', function() {
@@ -18,26 +20,31 @@ socket.on('id', function(data) {
 });
 
 function start() {
-    began = true;
     document.getElementById('overlay').style.display = 'none';
     socket.emit('start', {id: id});
+    began = true;
 }
-
-var board, BOARD_WIDTH, BOARD_HEIGHT;
-var px = [], py = [], pid = [];
 socket.on('board-init', function(data) {
     board = data.board;
     BOARD_WIDTH = data.width;
     BOARD_HEIGHT = data.height;
 });
 socket.on('board-update', function(data) {
-    board = data.board;
-})
+    for(var i = 0; i < data.boardDeltas.length; i++) {
+        var del = data.boardDeltas[i];
+        board[del.x][del.y] = del.to;
+        boardAssoc[del.x*BOARD_WIDTH+del.y] = del.id;
+        console.log(del.id);
+    }
+});
 socket.on('player-update', function(data) {
     px = data.px;
     py = data.py;
+    plx = data.plx;
+    ply = data.ply;
     pid = data.pid;
-})
+    pt = data.pt;
+});
 
 document.addEventListener('keydown', function(e) {
     if (!began)
@@ -63,6 +70,7 @@ document.addEventListener('keydown', function(e) {
     }
     if (oiX != inputX || oiY != inputY)
         socket.emit('dir-input', {
+            id: id,
             dx: inputX,
             dy: inputY
         });
@@ -80,6 +88,7 @@ document.addEventListener('keyup', function(e) {
         inputY = 0;
     if (oiX != inputX || oiY != inputY)
         socket.emit('dir-input', {
+            id: id,
             dx: inputX,
             dy: inputY
         });

@@ -6,6 +6,9 @@ var Player = function(ID, X, Y) {
         y: Y,
         dx: 0,
         dy: 0,
+        lx: X,
+        ly: Y,
+        time: 0,
     }
     return self;
 }
