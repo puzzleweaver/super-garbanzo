@@ -87,39 +87,36 @@ function setBoard(x, y, to, id) {
         id: id,
     });
     board[x][y] = to;
-    if(player_list[to] != undefined) {
+    if (player_list[to] != undefined) {
         player_list[to].bx = x;
         player_list[to].by = y;
     }
 }
 
 function move(x, y, dx, dy, pid) {
-    if ((dx == 0 && dy == 0) || x + dx < 0 || x + dx >= BOARD_WIDTH || y + dy < 0 || y + dy >= BOARD_HEIGHT)
+    if (dx == 0 && dy == 0)
         return false;
     var ret = true;
-    if (board[x + dx][y + dy] != 0 && board[x + dx][y + dy] != pid && board[x + dx][y + dy] != -1)
+    var nx = (x+dx+BOARD_WIDTH)%BOARD_WIDTH, ny = (y+dy+BOARD_HEIGHT)%BOARD_HEIGHT;
+    if (board[nx][ny] != 0 && board[nx][ny] != pid && board[nx][ny] != -1)
         return false;
-    if (board[x + dx][y + dy] != -1) {
-        ret = move(x + dx, y + dy, dx, dy, pid);
+    if (board[nx][ny] != -1) {
+        ret = move(nx, ny, dx, dy, pid);
     }
-    if (ret) setBoard(x + dx, y + dy, board[x][y], pid);
+    if (ret) setBoard(nx, ny, board[x][y], pid);
     return ret;
 }
 
 setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
-        if (player.x + player.dx < 0 || player.x + player.dx >= BOARD_WIDTH)
-            player.dx = 0;
-        if (player.y + player.dy < 0 || player.y + player.dy >= BOARD_HEIGHT)
-            player.dy = 0;
         if (player.time <= 0) {
             if (move(player.x, player.y, player.dx, player.dy, player.id)) {
                 setBoard(player.x, player.y, -1, undefined);
                 player.lx = player.x;
                 player.ly = player.y;
-                player.x += player.dx;
-                player.y += player.dy;
+                player.x = (player.x+player.dx+BOARD_WIDTH)%BOARD_WIDTH;
+                player.y = (player.y+player.dy+BOARD_WIDTH)%BOARD_WIDTH;
                 player.time = tick - subtick;
             }
         } else
