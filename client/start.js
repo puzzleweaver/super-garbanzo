@@ -6,7 +6,7 @@ var began = false;
 var inputX = 0,
     inputY = 0;
 var board, BOARD_WIDTH, BOARD_HEIGHT;
-var boardAssoc = {};
+var boardAssoc;
 
 btn = document.getElementById('btn');
 btn.addEventListener('click', function() {
@@ -28,22 +28,23 @@ socket.on('board-init', function(data) {
     board = data.board;
     BOARD_WIDTH = data.width;
     BOARD_HEIGHT = data.height;
+    boardAssoc = [];
+    for(var i = 0; i < BOARD_WIDTH; i++) {
+        boardAssoc[i] = [];
+        for(var j = 0; j < BOARD_HEIGHT; j++) {
+            boardAssoc[i][j] = undefined;
+        }
+    }
 });
 socket.on('board-update', function(data) {
     for(var i = 0; i < data.boardDeltas.length; i++) {
         var del = data.boardDeltas[i];
         board[del.x][del.y] = del.to;
-        boardAssoc[del.x*BOARD_WIDTH+del.y] = del.id;
-        console.log(del.id);
+        boardAssoc[del.x][del.y] = del.id;
     }
 });
 socket.on('player-update', function(data) {
-    px = data.px;
-    py = data.py;
-    plx = data.plx;
-    ply = data.ply;
-    pid = data.pid;
-    pt = data.pt;
+    ps = data.ps;
 });
 
 document.addEventListener('keydown', function(e) {

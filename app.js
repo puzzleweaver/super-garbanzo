@@ -23,7 +23,7 @@ var board = [],
 for (var i = 0; i < BOARD_WIDTH; i++) {
     board.push([]);
     for (var j = 0; j < BOARD_HEIGHT; j++) {
-        board[i].push(Math.random() < 0.9 ? 0 : 1);
+        board[i].push(Math.random() < 0.9 ? -1 : 0);
     }
 }
 boardDeltas = [];
@@ -38,6 +38,7 @@ io.on('connection', function(socket) {
     socket.on('start', function(data) {
         player_list[data.id] = new player(data.id,
             Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT));
+        board[player_list[data.id].x][player_list[data.id].y] = 0 + data.id;
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
@@ -56,8 +57,8 @@ io.on('connection', function(socket) {
 
 });
 
-var tick = 150,
-    subtick = 30;
+var tick = 135,
+    subtick = 45;
 
 function setBoard(x, y, to, id) {
     boardDeltas.push({
@@ -72,21 +73,24 @@ function setBoard(x, y, to, id) {
 function move(x, y, dx, dy, pid) {
     if ((dx == 0 && dy == 0) || x + dx < 0 || x + dx >= BOARD_WIDTH || y + dy < 0 || y + dy >= BOARD_HEIGHT)
         return;
-    if (board[x + dx][y + dy] == 1) {
-        move(x + dx, y + dy, dx, dy);
+    if (board[x + dx][y + dy] >= 0) {
+        move(x + dx, y + dy, dx, dy, pid);
     }
     setBoard(x + dx, y + dy, board[x][y], pid);
-    setBoard(x, y, 0, pid);
 }
 
 setInterval(function() {
     for (var i in player_list) {
         var player = player_list[i];
-        if (player.time <= 0 && player.x + player.dx >= 0 && player.x + player.dx < BOARD_WIDTH &&
-                player.y + player.dy >= 0 && player.y + player.dy < BOARD_HEIGHT) {
+        if (player.x + player.dx < 0 || player.x + player.dx >= BOARD_WIDTH)
+            player.dx = 0;
+        if (player.y + player.dy < 0 || player.y + player.dy >= BOARD_HEIGHT)
+            player.dy = 0;
+        if (player.time <= 0) {
+            move(player.x, player.y, player.dx, player.dy, player.id);
+            setBoard(player.x, player.y, -1, undefined);
             player.lx = player.x;
             player.ly = player.y;
-            move(player.x, player.y, player.dx, player.dy, player.id);
             player.x += player.dx;
             player.y += player.dy;
             player.time = tick;
@@ -94,31 +98,22 @@ setInterval(function() {
             player.time -= subtick;
     }
 
-    var px = [],
-        py = [],
-        plx = [],
-        ply = [],
-        pid = [],
-        pt = [];
+    var ps = {};
     for (var i in player_list) {
-        px.push(player_list[i].x);
-        py.push(player_list[i].y);
-        plx.push(player_list[i].lx);
-        ply.push(player_list[i].ly);
-        pid.push(player_list[i].id);
-        pt.push(player_list[i].time);
+        ps[i] = {
+            x: player_list[i].x,
+            y: player_list[i].y,
+            lx: player_list[i].lx,
+            ly: player_list[i].ly,
+            t: player_list[i].time,
+        };
     }
 
     for (var i in socket_list) {
         if (player_list[i] == undefined)
             continue;
         socket_list[i].emit('player-update', {
-            px: px,
-            py: py,
-            plx: plx,
-            ply: ply,
-            pt: pt,
-            pid: pid,
+            ps: ps,
         });
         socket_list[i].emit('board-update', {
             boardDeltas: boardDeltas,

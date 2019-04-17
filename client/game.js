@@ -17,45 +17,39 @@ function update() {
     draw();
 }
 
-var ofx = 0,
-    ofy = 0;
-
 function get_x(x, i) {
-    return (plx[i] - px[i]) * pt[i] / 150 + x;
+    return (ps[i].lx - ps[i].x) * ps[i].t / 150 + x;
 }
 
 function get_y(y, i) {
-    return (ply[i] - py[i]) * pt[i] / 150 + y;
+    return (ps[i].ly - ps[i].y) * ps[i].t / 150 + y;
 }
 
 function draw() {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, c.width, c.height);
+    ofx = get_x(ps[id].x, id);
+    ofy = get_y(ps[id].y, id);
     for (var i = 0; i < BOARD_WIDTH; i++) {
         for (var j = 0; j < BOARD_HEIGHT; j++) {
-            if (board[i][j] == 1) {
+            if (board[i][j] >= 0)
                 ctx.strokeStyle = 'white';
-                var ba = boardAssoc[i * BOARD_WIDTH + j];
-                if (ba == undefined) {
-                    ctx.strokeRect(c.width / 2 + (i - ofx) * SIZE + 2,
-                            c.height / 2 + (j - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
-                }else {
-                    console.log("happened!");
-                    ctx.strokeRect(c.width / 2 + (get_x(i, ba) - ofx) * SIZE + 2,
-                            c.height / 2 + (get_y(j, ba) - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
-                    // if(get_x(i, ba) == i && get_y(j, ba) == j)
-                    //     boardAssoc[i * BOARD_WIDTH + j] = undefined;
-                }
+            else ctx.strokeStyle = 'black';
+            var ba = boardAssoc[i][j];
+            if (ba == undefined) {
+                ctx.strokeRect(c.width / 2 + (i - ofx) * SIZE + 2,
+                    c.height / 2 + (j - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
+            } else {
+                ctx.strokeRect(c.width / 2 + (get_x(i, ba) - ofx) * SIZE + 2,
+                    c.height / 2 + (get_y(j, ba) - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
+                if(get_x(i, ba) == i && get_y(j, ba) == j)
+                    boardAssoc[i][j] = undefined; // reset things that are done moving
             }
         }
     }
-    for (var i = 0; i < pid.length; i++) {
-        if (pid[i] == id) {
-            ofx = get_x(px[i], i);
-            ofy = get_y(py[i], i);
-        }
+    for (var i in ps) {
         ctx.strokeStyle = 'green';
-        ctx.strokeRect(c.width / 2 + (get_x(px[i], i) - ofx) * SIZE + 2, c.height / 2 + (get_y(py[i], i) - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
+        ctx.strokeRect(c.width / 2 + (get_x(ps[i].x, i) - ofx) * SIZE + 2, c.height / 2 + (get_y(ps[i].y, i) - ofy) * SIZE + 2, SIZE - 4, SIZE - 4);
     }
 }
 
