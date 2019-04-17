@@ -13,8 +13,14 @@ serv.listen(2000);
 
 // socket setup
 var io = socket(serv);
+var socket_list = [];
 
 io.on('connection', function(socket) {
+
+    socket_list[socket.id] = socket;
+    socket.emit('id', {
+        id: socket.id,
+    });
 
     socket.on('client-message', function(data) {
         console.log("server received client-message");
