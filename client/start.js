@@ -22,7 +22,7 @@ socket.on('id', function(data) {
 
 socket.on('rejected', function(data) {
     document.getElementById('overlay').style.display = 'block';
-
+    console.log("REJECTED.");
 });
 
 function start() {

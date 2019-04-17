@@ -40,6 +40,7 @@ io.on('connection', function(socket) {
         player_list[data.id] = new player(data.id,
             Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * BOARD_HEIGHT));
         board[player_list[data.id].x][player_list[data.id].y] = data.id;
+        board[player_list[data.id].x][player_list[data.id].y] = data.id + 1;
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
