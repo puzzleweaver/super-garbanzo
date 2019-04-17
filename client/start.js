@@ -1,7 +1,7 @@
 // js code for setting up communications with the server and starting the game
 
 var socket = io.connect('http://localhost:2000');
-var id;
+var id, tick;
 var began = false;
 var inputX = 0,
     inputY = 0;
@@ -17,6 +17,12 @@ btn.addEventListener('click', function() {
 
 socket.on('id', function(data) {
     id = data.id;
+    tick = data.tick;
+});
+
+socket.on('rejected', function(data) {
+    document.getElementById('overlay').style.display = 'block';
+
 });
 
 function start() {
