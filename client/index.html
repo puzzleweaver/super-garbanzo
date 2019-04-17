@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<link rel="stylesheet" type="text/css" href="client/style.css">
+	<script src="https://cdn.socket.io/socket.io-1.7.3.js"></script>
 </head>
 <body>
-
-	<canvas id="c" style="display:none;"></canvas>
-
-	<script src="https://cdn.socket.io/socket.io-1.7.3.js"></script>
-
-	<button id="btn">send client message</button>
-
+	<canvas id="c2d"></canvas>
 	<div id="overlay" display="block">
 		<div id="box">
 			<br><br>Super-Garbanzo<br>
-			<button id="btn" onclick="start()">Button</button>
+			<button id="btn" onclick="start()">Start Game</button>
 		</div>
 	</div>
-
-	<script src="client/game.js"></script>
-
 </body>
+
+<script src="client/start.js"></script>
+<script src="client/game.js"></script>
+
 </html>

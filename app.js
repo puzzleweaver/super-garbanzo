@@ -22,9 +22,13 @@ io.on('connection', function(socket) {
         id: socket.id,
     });
 
+    socket.on('start', function(data) {
+
+    });
+
     socket.on('client-message', function(data) {
-        console.log("server received client-message");
-        socket.emit("server-message", {message: "hi client,\nfrom server <3"});
+        console.log('server received client-message');
+        socket.emit('server-message', {message: 'hi client,\nfrom server <3'});
         // ...
     });
 
