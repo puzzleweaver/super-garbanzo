@@ -31,8 +31,8 @@ for (var i = 0; i < BOARD_WIDTH; i++) {
 boardDeltas = [];
 
 function exit_game(id) {
-    board[player_list[id].x][player_list[id].y] = -1;
-    board[player_list[id].bx][player_list[id].by] = -1;
+    setBoard(player_list[id].x, player_list[id].y, -1);
+    setBoard(player_list[id].bx, player_list[id].by, -1);
     delete player_list[id];
 }
 
@@ -48,8 +48,8 @@ io.on('connection', function(socket) {
         player_list[data.id] = new player(data.id,
             Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * (BOARD_HEIGHT - 1)),
             Math.random());
-        board[player_list[data.id].x][player_list[data.id].y] = data.id;
-        board[player_list[data.id].x][player_list[data.id].y + 1] = data.id;
+        setBoard(player_list[data.id].x, player_list[data.id].y, data.id);
+        setBoard(player_list[data.id].x, player_list[data.id].y + 1, data.id);
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
@@ -70,10 +70,8 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        if (player_list[socket.id] != undefined) {
-            console.log(socket.id, "disconnected.");
+        if (player_list[socket.id] != undefined)
             exit_game(socket.id);
-        }
     });
 
 });
@@ -81,7 +79,7 @@ io.on('connection', function(socket) {
 var tick = 100,
     subtick = 20;
 
-function setBoard(x, y, to, id) {
+function setBoardV(x, y, to, id, is_player) {
     boardDeltas.push({
         x: x,
         y: y,
@@ -89,10 +87,13 @@ function setBoard(x, y, to, id) {
         id: id,
     });
     board[x][y] = to;
-    if (player_list[to] != undefined) {
+    if (!is_player && player_list[to] != undefined) {
         player_list[to].bx = x;
         player_list[to].by = y;
     }
+}
+function setBoard(x, y, to) {
+    setBoardV(x, y, to, undefined, true);
 }
 
 // returns false for unable to move, true for able to move, and -1 for loops
@@ -109,7 +110,7 @@ function move(x0, y0, x, y, dx, dy, pid) {
     if (board[nx][ny] != -1)
         ret = move(x0, y0, nx, ny, dx, dy, pid);
     if (ret != false)
-        setBoard(nx, ny, board[x][y], pid);
+        setBoardV(nx, ny, board[x][y], pid, x0==x && y0==y);
     return ret;
 }
 
@@ -123,10 +124,10 @@ setInterval(function() {
                     player.dx, player.dy, i);
             if(ret != false) {
                 if(ret != -1)
-                    setBoard(player.x, player.y, -1, undefined);
+                    setBoard(player.x, player.y, -1);
                 else
-                    setBoard(player.x, player.y,
-                        loop_box, i);
+                    setBoardV(player.x, player.y,
+                        loop_box, i, false);
                 player.lx = player.x;
                 player.ly = player.y;
                 player.x = (player.x + player.dx + BOARD_WIDTH) % BOARD_WIDTH;
