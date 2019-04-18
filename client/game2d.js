@@ -1,6 +1,6 @@
 // js code for rendering the board (eventually will use webGL, ideally)
 
-var c = document.getElementById('c2d');
+var c = document.getElementById('cnvs');
 c.width = window.innerWidth;
 c.height = window.innerHeight;
 var ctx = c.getContext('2d');

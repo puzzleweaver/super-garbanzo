@@ -8,6 +8,7 @@ var inputX = 0,
     inputY = 0;
 var board, BOARD_WIDTH, BOARD_HEIGHT;
 var boardAssoc;
+var ps = undefined;
 
 socket.on('id', function(data) {
     id = data.id;
@@ -28,6 +29,7 @@ socket.on('board-init', function(data) {
     board = data.board;
     BOARD_WIDTH = data.width;
     BOARD_HEIGHT = data.height;
+    init_gfx();
     boardAssoc = [];
     for(var i = 0; i < BOARD_WIDTH; i++) {
         boardAssoc[i] = [];
@@ -58,7 +60,7 @@ document.addEventListener('keydown', function(e) {
         inputY = 0;
     } else if (e.keyCode == 38 || e.keyCode == 87) {
         // up
-        inputY = -1;
+        inputY = 1;
         inputX = 0;
     } else if (e.keyCode == 39 || e.keyCode == 68) {
         // right
@@ -66,7 +68,7 @@ document.addEventListener('keydown', function(e) {
         inputY = 0;
     } else if (e.keyCode == 40 || e.keyCode == 83) {
         //down
-        inputY = 1;
+        inputY = -1;
         inputX = 0;
     }
     if (oiX != inputX || oiY != inputY)
@@ -84,8 +86,8 @@ document.addEventListener('keyup', function(e) {
     if ((inputX == -1 && (e.keyCode == 37 || e.keyCode == 65)) ||
         (inputX == 1 && (e.keyCode == 39 || e.keyCode == 68)))
         inputX = 0;
-    else if ((inputY == -1 && (e.keyCode == 38 || e.keyCode == 87)) ||
-        (inputY == 1 && (e.keyCode == 40 || e.keyCode == 83)))
+    else if ((inputY == 1 && (e.keyCode == 38 || e.keyCode == 87)) ||
+        (inputY == -1 && (e.keyCode == 40 || e.keyCode == 83)))
         inputY = 0;
     if (oiX != inputX || oiY != inputY)
         socket.emit('dir-input', {
