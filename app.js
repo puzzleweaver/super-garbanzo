@@ -57,8 +57,10 @@ io.on('connection', function(socket) {
         });
     });
     socket.on('dir-input', function(data) {
-        if (player_list[data.id] == undefined)
+        if (player_list[data.id] == undefined) {
             socket.emit('rejected', {});
+            return;
+        }
         var p = player_list[socket.id];
         player.time = 0;
         p.dx = data.dx;
