@@ -1,9 +1,7 @@
 // js code for setting up communications with the server and starting the game
 
-var socket = io.connect('localhost:80');
-console.log(socket);
+// var socket = io.connect('localhost:80');
 var socket = io.connect('https://super-garbanzo.herokuapp.com/');
-console.log(socket);
 var id, tick;
 var began = false;
 var inputX = 0,
