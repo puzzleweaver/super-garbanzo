@@ -24,7 +24,7 @@ for (var i = 0; i < BOARD_WIDTH; i++) {
     board.push([]);
     for (var j = 0; j < BOARD_HEIGHT; j++) {
         board[i].push(Math.random() < 0.9 ? -1 : 0);
-        if(j == 8)
+        if (j == 8)
             board[i][j] = 0;
     }
 }
@@ -94,6 +94,7 @@ function setBoardV(x, y, to, id, is_player) {
         player_list[to].by = y;
     }
 }
+
 function setBoard(x, y, to) {
     setBoardV(x, y, to, undefined, true);
 }
@@ -112,7 +113,7 @@ function move(x0, y0, x, y, dx, dy, pid) {
     if (board[nx][ny] != -1)
         ret = move(x0, y0, nx, ny, dx, dy, pid);
     if (ret != false)
-        setBoardV(nx, ny, board[x][y], pid, x0==x && y0==y);
+        setBoardV(nx, ny, board[x][y], pid, x0 == x && y0 == y);
     return ret;
 }
 
@@ -121,19 +122,19 @@ setInterval(function() {
         var player = player_list[i];
         if (player.time <= 0) {
             var loop_box = board[(player.x - player.dx + BOARD_WIDTH) % BOARD_WIDTH]
-                    [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT];
+                [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT];
             var ret = move(player.x, player.y, player.x, player.y,
-                    player.dx, player.dy, i);
-            if(ret != false) {
-                if(ret != -1)
+                player.dx, player.dy, i);
+            if (ret != false) {
+                if (ret != -1)
                     setBoard(player.x, player.y, -1);
                 else
                     setBoardV(player.x, player.y,
                         loop_box, i, false);
-                player.lx = player.x;
-                player.ly = player.y;
                 player.x = (player.x + player.dx + BOARD_WIDTH) % BOARD_WIDTH;
                 player.y = (player.y + player.dy + BOARD_WIDTH) % BOARD_WIDTH;
+                player.lx = player.x - player.dx;
+                player.ly = player.y - player.dy;
                 player.time = tick - subtick;
             }
         } else

@@ -1,34 +1,15 @@
-// ------------------------------------------------
-// BASIC SETUP
-// ------------------------------------------------
-
-// Create an empty scene
+// set up three.js
 var scene = new THREE.Scene();
-
-// Create a basic perspective camera
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.rotation.set(0.5, 0, 0);
-camera.position.set(0, 0, 10);
-
-// Create a renderer with Antialiasing
 var cnvs = document.getElementById('cnvs');
 var renderer = new THREE.WebGLRenderer({
     antialias: true,
     canvas: cnvs
 });
-
-// Configure renderer clear color
 renderer.setClearColor("#000000");
-
-// Configure renderer size
 renderer.setSize(window.innerWidth, window.innerHeight);
-
-// Append Renderer to DOM
 document.body.appendChild(renderer.domElement);
-
-// ------------------------------------------------
-// FUN STARTS HERE
-// ------------------------------------------------
 
 function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
     let shape = new THREE.Shape();
@@ -53,22 +34,58 @@ function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
     return geometry;
 }
 
+function addhh(xof, yof, mesh) {
+    mesht = mesh.clone();
+    mesht.position.set(mesht.position.x + xof, mesht.position.y + yof, mesht.position.z);
+    scene.add(mesht);
+}
+function addh(xof, yof, mesh) {
+    addhh(xof, yof, mesh);
+    addhh(xof, yof-BOARD_HEIGHT, mesh);
+    addhh(xof, yof+BOARD_HEIGHT, mesh);
+    addhh(xof, yof-2*BOARD_HEIGHT, mesh);
+}
+
+function add(mesh) {
+    addh(0, 0, mesh);
+    addh(BOARD_WIDTH, 0, mesh);
+    addh(-BOARD_WIDTH, 0, mesh);
+}
+
+function addl(mesh) {
+    addh(0, 0, mesh);
+    addh(BOARD_WIDTH, 0, mesh);
+    addh(-BOARD_WIDTH, 0, mesh);
+    addh(BOARD_WIDTH * 2, 0, mesh);
+    addh(-BOARD_WIDTH * 2, 0, mesh);
+    addh(BOARD_WIDTH * 3, 0, mesh);
+    addh(-BOARD_WIDTH * 3, 0, mesh);
+    addh(BOARD_WIDTH * 4, 0, mesh);
+    addh(-BOARD_WIDTH * 4, 0, mesh);
+    addh(BOARD_WIDTH * 5, 0, mesh);
+    addh(-BOARD_WIDTH * 5, 0, mesh);
+}
+
 // Create a Cube Mesh with basic material
-var arr = undefined, lights = [];
+var arr = undefined,
+    light;
+
+function set_cam(x, y) {
+    camera.position.set(x, y-5, 8);
+    light.position.set(x, y-3, 10);
+}
+
 function init_gfx() {
+    //new THREE.BoxGeometry( 1, 1, 1 );//
     var geometry = new THREE.BoxGeometry( 1, 1, 1 );//createBoxWithRoundedEdges(1, 1, 1, 0.3, 5);
     var material = new THREE.MeshLambertMaterial({
         color: "#ff00ff"
     });
     var cube = new THREE.Mesh(geometry, material);
-    for(var i = 0; i < 4; i++)
-        lights.push(new THREE.PointLight(0xffffff, 1, 1000));
-    lights[0].position.set(0, 0, 20);
-    lights[1].position.set(50, 0, 20);
-    lights[2].position.set(0, 50, 20);
-    lights[3].position.set(50, 50, 20);
-    for(var i = 0; i < lights.length; i++)
-        scene.add(lights[i]);
+
+    light = new THREE.PointLight( 0xffffff, 0.8 );
+    scene.add( light );
+
     arr = [];
     for (var i = 0; i < BOARD_WIDTH; i++) {
         arr[i] = [];
@@ -80,6 +97,13 @@ function init_gfx() {
             });
         }
     }
+    geometry = new THREE.BoxGeometry(BOARD_WIDTH * 3, BOARD_HEIGHT * 3, 1);
+    material = new THREE.MeshLambertMaterial({
+        color: "#ff00ff"
+    });
+    cube = new THREE.Mesh(geometry, material);
+    cube.position.set((BOARD_WIDTH - 1) / 2, (BOARD_HEIGHT - 1) / 2, -1);
+    scene.add(cube);
 }
 
 function get_x(x, i) {
@@ -89,25 +113,22 @@ function get_x(x, i) {
 function get_y(y, i) {
     return (ps[i].ly - ps[i].y) * ps[i].t / tick + y;
 }
-// Render Loop
+
 var render = function() {
     requestAnimationFrame(render);
 
-    while (scene.children.length > lights.length) {
-        scene.remove(scene.children[scene.children.length-1]);
+    while (scene.children.length > 2) {
+        scene.remove(scene.children[scene.children.length - 1]);
     }
 
+    if (ps != undefined) {
 
-    if(ps != undefined) {
-        console.log("ran");
-
-        camera.position.set(get_x(ps[id].x, id), get_y(ps[id].y, id)-5, 8);
+        set_cam(get_x(ps[id].x, id), get_y(ps[id].y, id));
 
         for (var i = 0; i < BOARD_WIDTH; i++) {
             for (var j = 0; j < BOARD_HEIGHT; j++) {
                 if (board[i][j] == -1)
                     continue;
-                scene.add(arr[i][j]);
                 if (board[i][j] == 0)
                     arr[i][j].material = new THREE.MeshLambertMaterial({
                         color: 'white'
@@ -124,6 +145,7 @@ var render = function() {
                     if (get_x(i, ba) == i && get_y(j, ba) == j)
                         boardAssoc[i][j] = undefined; // reset things that are done moving
                 }
+                add(arr[i][j]);
             }
         }
     }
