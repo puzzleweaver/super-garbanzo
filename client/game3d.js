@@ -1,14 +1,28 @@
 // set up three.js
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.rotation.set(0.5, 0, 0);
+var aspect_ratio = 1.5;
+var camera;
 var cnvs = document.getElementById('cnvs');
 var renderer = new THREE.WebGLRenderer({
     antialias: true,
     canvas: cnvs
 });
 renderer.setClearColor("#000000");
-renderer.setSize(window.innerWidth, window.innerHeight);
+
+window.onresize = function(event) {
+    var width = window.innerWidth, height = window.innerHeight;
+    if(width/height > aspect_ratio) {
+        width = height*aspect_ratio;
+    }else {
+        height = width/aspect_ratio;
+    }
+    camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 1000);
+    camera.rotation.set(0.5, 0, 0);
+    renderer.setSize(width, height);
+    var spcr = document.getElementById("spcr");
+    spcr.style.minHeight = ""+Math.floor((window.innerHeight-height)/2) + "px";
+};
+window.onresize(undefined);
 document.body.appendChild(renderer.domElement);
 
 function createBoxWithRoundedEdges(width, height, depth, radius0, smoothness) {
@@ -50,20 +64,6 @@ function add(mesh) {
     addh(0, 0, mesh);
     addh(BOARD_WIDTH, 0, mesh);
     addh(-BOARD_WIDTH, 0, mesh);
-}
-
-function addl(mesh) {
-    addh(0, 0, mesh);
-    addh(BOARD_WIDTH, 0, mesh);
-    addh(-BOARD_WIDTH, 0, mesh);
-    addh(BOARD_WIDTH * 2, 0, mesh);
-    addh(-BOARD_WIDTH * 2, 0, mesh);
-    addh(BOARD_WIDTH * 3, 0, mesh);
-    addh(-BOARD_WIDTH * 3, 0, mesh);
-    addh(BOARD_WIDTH * 4, 0, mesh);
-    addh(-BOARD_WIDTH * 4, 0, mesh);
-    addh(BOARD_WIDTH * 5, 0, mesh);
-    addh(-BOARD_WIDTH * 5, 0, mesh);
 }
 
 // Create a Cube Mesh with basic material
