@@ -8,16 +8,25 @@
 <body>
 	<div id="spcr"></div>
 	<canvas id="cnvs"></canvas>
-	<div id="overlay" display="block">
+	<div id="overlay-start" display="block">
 		<div id="box">
 			<br><br>Super-Garbanzo<br>
-			<button id="btn" onclick="start()">Start Game</button>
+			<button id="btn" onclick="start()">Start Game</button><br>
+			<input id="color_slider" type="range" min="0" max="360" value="180"
+					class="slider" oninput="color_slider()">
 		</div>
 	</div>
+	<!-- <div id="overlay-game-over" display="none">
+		<div id="box1">
+			<br><br>Super-Garbanzo<br>
+			<button id="btn1" onclick="start()">Start Game</button>
+		</div>
+	</div> -->
 </body>
 
 <script src="client/start.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/103/three.js"></script>
+<script src="client/three-extras.js"></script>
 <script src="client/game3d.js"></script>
 
 </html>

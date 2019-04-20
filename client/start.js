@@ -10,19 +10,28 @@ var board, BOARD_WIDTH, BOARD_HEIGHT;
 var boardAssoc;
 var ps = undefined;
 
+function color_slider() {
+    var root = document.documentElement;
+    var slider = document.getElementById("color_slider");
+    root.style.setProperty('--hue', slider.value);
+    slider.style.transitionDuration = "0.0s";
+}
+
 socket.on('id', function(data) {
     id = data.id;
     tick = data.tick;
 });
 
 socket.on('rejected', function(data) {
-    document.getElementById('overlay').style.display = 'block';
+    document.getElementById('overlay-start').style.display = 'block';
     console.log("REJECTED.");
 });
 
 function start() {
-    document.getElementById('overlay').style.display = 'none';
-    socket.emit('start', {id: id});
+    document.getElementById('overlay-start').style.display = 'none';
+    socket.emit('start', {
+        id: id
+    });
     began = true;
 }
 socket.on('board-init', function(data) {
@@ -31,15 +40,15 @@ socket.on('board-init', function(data) {
     BOARD_HEIGHT = data.height;
     init_gfx();
     boardAssoc = [];
-    for(var i = 0; i < BOARD_WIDTH; i++) {
+    for (var i = 0; i < BOARD_WIDTH; i++) {
         boardAssoc[i] = [];
-        for(var j = 0; j < BOARD_HEIGHT; j++) {
+        for (var j = 0; j < BOARD_HEIGHT; j++) {
             boardAssoc[i][j] = undefined;
         }
     }
 });
 socket.on('board-update', function(data) {
-    for(var i = 0; i < data.boardDeltas.length; i++) {
+    for (var i = 0; i < data.boardDeltas.length; i++) {
         var del = data.boardDeltas[i];
         board[del.x][del.y] = del.to;
         boardAssoc[del.x][del.y] = del.id;
