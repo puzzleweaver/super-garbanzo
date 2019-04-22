@@ -29,8 +29,11 @@ socket.on('rejected', function(data) {
 
 function start() {
     document.getElementById('overlay-start').style.display = 'none';
+    var slider = document.getElementById("color_slider");
+    console.log(slider.value);
     socket.emit('start', {
-        id: id
+        id: id,
+        color: slider.value,
     });
     began = true;
 }

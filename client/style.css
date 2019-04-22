@@ -1,5 +1,5 @@
 :root {
-  --hue: 120;
+  --hue: 180;
 }
 
 html, body {
@@ -41,7 +41,7 @@ canvas {
 }
 
 .slider::-webkit-slider-thumb:hover {
-  background-color: hsl(var(--hue), 50%, 50%); /* Green */
+  background-color: hsl(var(--hue), 100%, 50%); /* Green */
 }
 
 .slider::-webkit-slider-thumb {
@@ -102,5 +102,5 @@ button {
     transition-duration: 0.0s;
 }
 button:hover {
-  background-color: hsl(var(--hue), 50%, 50%);
+  background-color: hsl(var(--hue), 100%, 50%);
 }

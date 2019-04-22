@@ -47,7 +47,7 @@ io.on('connection', function(socket) {
     socket.on('start', function(data) {
         player_list[data.id] = new player(data.id,
             Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * (BOARD_HEIGHT - 1)),
-            Math.random());
+            data.color);
         setBoard(player_list[data.id].x, player_list[data.id].y, data.id);
         setBoard(player_list[data.id].x, player_list[data.id].y + 1, data.id);
         socket.emit('board-init', {

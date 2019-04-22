@@ -50,7 +50,7 @@ var arr = undefined,
     light;
 
 function set_cam(x, y) {
-    camera.position.set(x, y - 5, 8);
+    camera.position.set(x, y-5, 8);
     light.position.set(x, y - 3, 10);
 }
 
@@ -62,17 +62,28 @@ function init_gfx() {
     scene.add(light);
     numConstObjs++;
 
-    var map = new THREE.TextureLoader().load('client/testure.jpg');
+    var map = new THREE.TextureLoader().load('client/gust.png');
     map.wrapS = map.wrapT = THREE.RepeatWrapping;
-    map.anisotropy = 16;
-    var plane_geometry = new THREE.BoxGeometry(BOARD_WIDTH * 3, BOARD_HEIGHT * 3, 0.1);
+    var plane_geometry = new THREE.PlaneGeometry(BOARD_WIDTH, BOARD_HEIGHT, 10, 10);
     var plane_material = new THREE.MeshPhongMaterial({
         map: map
     });
-    var plane = new THREE.Mesh(plane_geometry, plane_material);
-    plane.position.set(0, 0, -1);
-    scene.add(plane);
+    plane_material.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    plane_material.map.minFilter = THREE.LinearFilter;
+    for(var i = -1; i <= 1; i++) {
+        for(var j = -1; j <= 1; j++) {
+            var plane = new THREE.Mesh(plane_geometry, plane_material);
+            plane.position.set(BOARD_WIDTH*i + (BOARD_WIDTH-1)/2, BOARD_HEIGHT*j + (BOARD_HEIGHT-1)/2, -1/2);
+            scene.add(plane);
+            numConstObjs++;
+        }
+    }
 
+    // var lgeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    // var edges = new THREE.EdgesGeometry( lgeometry );
+    // var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { linewidth:5,color: 0xffffff } ) );
+    // scene.add( line );
+    // numConstObjs++;
 
     // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
     // var geometry = new THREE.SphereGeometry( 0.5, 35, 35 );
@@ -85,9 +96,7 @@ function init_gfx() {
         for (var j = 0; j < BOARD_HEIGHT; j++) {
             arr[i][j] = cube.clone();
             arr[i][j].position.set(i, j, 0);
-            arr[i][j].material = new THREE.MeshPhongMaterial({
-                color: ("hsl(" + Math.floor(Math.random() * 360) + ", 100%, 50%)")
-            });
+            arr[i][j].material = new THREE.MeshPhongMaterial();
         }
     }
 }
@@ -103,7 +112,7 @@ function get_y(y, i) {
 var render = function() {
     requestAnimationFrame(render);
 
-    while (scene.children.length > 2) {
+    while (scene.children.length > numConstObjs) {
         scene.remove(scene.children[scene.children.length - 1]);
     }
 
@@ -121,7 +130,7 @@ var render = function() {
                     });
                 else if (ps[board[i][j]] != undefined)
                     arr[i][j].material = new THREE.MeshPhongMaterial({
-                        color: ('hsl(' + ps[board[i][j]].color * 360 + ', 100%, 50%)'),
+                        color: ('hsl(' + ps[board[i][j]].color + ', 100%, 50%)'),
                     });
                 var ba = boardAssoc[i][j];
                 if (ba == undefined || ps[ba] == undefined)
