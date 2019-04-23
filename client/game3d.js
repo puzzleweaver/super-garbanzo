@@ -55,6 +55,7 @@ function set_cam(x, y) {
 }
 
 var numConstObjs = 0;
+var box, rbox, sphere, wiref; // reusable meshes
 
 function init_gfx() {
 
@@ -79,26 +80,14 @@ function init_gfx() {
         }
     }
 
-    // var lgeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
-    // var edges = new THREE.EdgesGeometry( lgeometry );
-    // var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { linewidth:5,color: 0xffffff } ) );
-    // scene.add( line );
-    // numConstObjs++;
+    var lgeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    var edges = new THREE.EdgesGeometry( lgeometry );
+    wiref = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
 
-    // var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    // var geometry = new THREE.SphereGeometry( 0.5, 35, 35 );
-    var geometry = createBoxWithRoundedEdges(1, 1, 1, 0.1, 5);
     var material = new THREE.MeshPhongMaterial();
-    var cube = new THREE.Mesh(geometry, material);
-    arr = [];
-    for (var i = 0; i < BOARD_WIDTH; i++) {
-        arr[i] = [];
-        for (var j = 0; j < BOARD_HEIGHT; j++) {
-            arr[i][j] = cube.clone();
-            arr[i][j].position.set(i, j, 0);
-            arr[i][j].material = new THREE.MeshPhongMaterial();
-        }
-    }
+    box = new THREE.Mesh(new THREE.BoxGeometry( 1, 1, 1 ), material);
+    sphere = new THREE.Mesh(new THREE.SphereGeometry( 0.5, 35, 35 ), material);
+    rbox = new THREE.Mesh(createBoxWithRoundedEdges(1, 1, 1, 0.1, 5), material);
 }
 
 function get_x(x, i) {
@@ -122,26 +111,63 @@ var render = function() {
 
         for (var i = 0; i < BOARD_WIDTH; i++) {
             for (var j = 0; j < BOARD_HEIGHT; j++) {
-                if (board[i][j] == -1)
+                // if space is empty
+                if (board[i][j] == -1 || (board[i][j] != 0 &&
+                        ps[board[i][j]].x == i && ps[board[i][j]].y == j))
                     continue;
-                if (board[i][j] == 0)
-                    arr[i][j].material = new THREE.MeshPhongMaterial({
-                        color: 'white',
-                    });
-                else if (ps[board[i][j]] != undefined)
-                    arr[i][j].material = new THREE.MeshPhongMaterial({
-                        color: ('hsl(' + ps[board[i][j]].color + ', 100%, 50%)'),
-                    });
+
+                // calculate offset if being pushed
+                var x, y;
                 var ba = boardAssoc[i][j];
-                if (ba == undefined || ps[ba] == undefined)
-                    arr[i][j].position.set(i, j, 0);
-                else {
-                    arr[i][j].position.set(get_x(i, ba), get_y(j, ba), 0);
+                if (ba == undefined || ps[ba] == undefined) {
+                    x = i;
+                    y = j;
+                } else {
+                    x = get_x(i, ba);
+                    y = get_y(j, ba);
                     if (get_x(i, ba) == i && get_y(j, ba) == j)
                         boardAssoc[i][j] = undefined; // reset things that are done moving
                 }
-                add(arr[i][j]);
+
+                // if space is unowned box
+                if (board[i][j] == 0) {
+                    box.material = new THREE.MeshPhongMaterial({
+                        color: 'white',
+                    });
+                    box.position.set(x, y, 0);
+                    add(box);
+                    if(false) {
+                        wiref.position.set(x, y, 0);
+                        wiref.material = new THREE.LineBasicMaterial({
+                            color: 0xffffff,
+                        });
+                        add(wiref);
+                        wiref.rotation.set(Math.random(), Math.random(), Math.random());
+                    }
+                } else if (ps[board[i][j]] != undefined) {
+                    // sphere
+                    sphere.material = new THREE.MeshPhongMaterial({
+                        color: ('hsl(' + ps[board[i][j]].color + ', 100%, 50%)'),
+                    });
+                    sphere.position.set(x, y, 0);
+                    add(sphere);
+                    // jiggy wireframe
+                    wiref.position.set(x, y, 0);
+                    wiref.material = new THREE.LineBasicMaterial({
+                        color: ('hsl(' + ps[board[i][j]].color + ', 100%, 50%)'),
+                    });
+                    add(wiref);
+                    wiref.rotation.set(Math.random(), Math.random(), Math.random());
+                }
             }
+        }
+
+        for(i in ps) {
+            rbox.material = new THREE.MeshPhongMaterial({
+                color: ('hsl(' + ps[i].color + ', 100%, 50%)'),
+            });
+            rbox.position.set(get_x(ps[i].x, i), get_y(ps[i].y, i), 0);
+            add(rbox);
         }
     }
 
