@@ -1,7 +1,6 @@
 var Player = function(ID, X, Y, COLOR) {
     var self = {
         id: ID,
-        name: "",
         x: X,
         y: Y,
         dx: 0,
@@ -10,6 +9,7 @@ var Player = function(ID, X, Y, COLOR) {
         ly: Y,
         bx: X,
         by: Y+1,
+        r: 0,
         color: COLOR,
         time: 0,
     }

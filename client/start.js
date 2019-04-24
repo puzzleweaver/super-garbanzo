@@ -1,7 +1,7 @@
 // js code for setting up communications with the server and starting the game
 
-// var socket = io.connect('localhost:80');
-var socket = io.connect('https://super-garbanzo.herokuapp.com/');
+var socket = io.connect('localhost:80');
+// var socket = io.connect('https://super-garbanzo.herokuapp.com/');
 var id, tick;
 var began = false;
 var inputX = 0,
@@ -22,13 +22,13 @@ socket.on('id', function(data) {
     tick = data.tick;
 });
 
-socket.on('rejected', function(data) {
-    document.getElementById('overlay-start').style.display = 'block';
-    console.log("REJECTED.");
+socket.on('gameover', function(data) {
+    document.getElementById('overlay-gameover').style.display = 'block';
 });
 
 function start() {
     document.getElementById('overlay-start').style.display = 'none';
+    document.getElementById('overlay-gameover').style.display = 'none';
     var slider = document.getElementById("color_slider");
     console.log(slider.value);
     socket.emit('start', {
@@ -36,6 +36,11 @@ function start() {
         color: slider.value,
     });
     began = true;
+}
+
+function restart() {
+    document.getElementById('overlay-start').style.display = 'block';
+    document.getElementById('overlay-gameover').style.display = 'none';
 }
 socket.on('board-init', function(data) {
     board = data.board;

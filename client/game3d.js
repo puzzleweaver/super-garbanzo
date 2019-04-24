@@ -26,23 +26,14 @@ window.onresize = function(event) {
 window.onresize(undefined);
 document.body.appendChild(renderer.domElement);
 
-function addhh(xof, yof, mesh) {
-    mesht = mesh.clone();
-    mesht.position.set(mesht.position.x + xof, mesht.position.y + yof, mesht.position.z);
-    scene.add(mesht);
-}
-
-function addh(xof, yof, mesh) {
-    addhh(xof, yof, mesh);
-    addhh(xof, yof - BOARD_HEIGHT, mesh);
-    addhh(xof, yof + BOARD_HEIGHT, mesh);
-    addhh(xof, yof - 2 * BOARD_HEIGHT, mesh);
-}
-
 function add(mesh) {
-    addh(0, 0, mesh);
-    addh(BOARD_WIDTH, 0, mesh);
-    addh(-BOARD_WIDTH, 0, mesh);
+    for(var x = -1; x <= 1; x++) {
+        for(var y = -2; y <= 1; y++) {
+            var mesht = mesh.clone();
+            mesht.position.set(mesht.position.x + x*BOARD_WIDTH, mesht.position.y + y*BOARD_HEIGHT, mesht.position.z);
+            scene.add(mesht);
+        }
+    }
 }
 
 // Create a Cube Mesh with basic material
@@ -58,6 +49,10 @@ var numConstObjs = 0;
 var box, rbox, sphere, wiref; // reusable meshes
 
 function init_gfx() {
+
+    while (scene.children.length > 0) {
+        scene.remove(scene.children[scene.children.length - 1]);
+    }
 
     light = new THREE.PointLight(0xffffff, 0.8);
     scene.add(light);
@@ -80,7 +75,7 @@ function init_gfx() {
         }
     }
 
-    var lgeometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+    var lgeometry = new THREE.BoxBufferGeometry( 0.8, 0.8, 0.8 );
     var edges = new THREE.EdgesGeometry( lgeometry );
     wiref = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
 
@@ -122,6 +117,7 @@ var render = function() {
                 if (ba == undefined || ps[ba] == undefined) {
                     x = i;
                     y = j;
+                    boardAssoc[i][j] = undefined;
                 } else {
                     x = get_x(i, ba);
                     y = get_y(j, ba);
@@ -131,19 +127,11 @@ var render = function() {
 
                 // if space is unowned box
                 if (board[i][j] == 0) {
-                    box.material = new THREE.MeshPhongMaterial({
+                    rbox.material = new THREE.MeshPhongMaterial({
                         color: 'white',
                     });
-                    box.position.set(x, y, 0);
-                    add(box);
-                    if(false) {
-                        wiref.position.set(x, y, 0);
-                        wiref.material = new THREE.LineBasicMaterial({
-                            color: 0xffffff,
-                        });
-                        add(wiref);
-                        wiref.rotation.set(Math.random(), Math.random(), Math.random());
-                    }
+                    rbox.position.set(x, y, 0);
+                    add(rbox);
                 } else if (ps[board[i][j]] != undefined) {
                     // sphere
                     sphere.material = new THREE.MeshPhongMaterial({
@@ -151,13 +139,17 @@ var render = function() {
                     });
                     sphere.position.set(x, y, 0);
                     add(sphere);
-                    // jiggy wireframe
-                    wiref.position.set(x, y, 0);
-                    wiref.material = new THREE.LineBasicMaterial({
-                        color: ('hsl(' + ps[board[i][j]].color + ', 100%, 50%)'),
-                    });
-                    add(wiref);
-                    wiref.rotation.set(Math.random(), Math.random(), Math.random());
+
+                    for(var a = -ps[board[i][j]].r; a <= ps[board[i][j]].r; a++) {
+                        for(var b = -ps[board[i][j]].r; b <= ps[board[i][j]].r; b++) {
+                            wiref.material = new THREE.LineBasicMaterial({
+                                color: ('hsl(' + ps[board[i][j]].color + ', 50%, 50%)'),
+                            });
+                            wiref.position.set(x+a, y+b, 0);
+                            wiref.rotation.set(Math.random(), Math.random(), Math.random());
+                            add(wiref);
+                        }
+                    }
                 }
             }
         }

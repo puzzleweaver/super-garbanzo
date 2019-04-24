@@ -20,6 +20,7 @@ var player_list = {};
 var board = [],
     BOARD_WIDTH = 20,
     BOARD_HEIGHT = 20;
+var ptr = [];
 for (var i = 0; i < BOARD_WIDTH; i++) {
     board.push([]);
     for (var j = 0; j < BOARD_HEIGHT; j++) {
@@ -31,6 +32,8 @@ for (var i = 0; i < BOARD_WIDTH; i++) {
 boardDeltas = [];
 
 function exit_game(id) {
+    if(player_list[id] == undefined)
+        return;
     setBoard(player_list[id].x, player_list[id].y, -1);
     setBoard(player_list[id].bx, player_list[id].by, -1);
     delete player_list[id];
@@ -45,6 +48,8 @@ io.on('connection', function(socket) {
     });
 
     socket.on('start', function(data) {
+        if(player_list[data.id] != undefined)
+            return;
         player_list[data.id] = new player(data.id,
             Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * (BOARD_HEIGHT - 1)),
             data.color);
@@ -57,23 +62,17 @@ io.on('connection', function(socket) {
         });
     });
     socket.on('dir-input', function(data) {
-        if (player_list[data.id] == undefined) {
-            socket.emit('rejected', {});
+        if (player_list[socket.id] == undefined || data.id != socket.id)
             return;
-        }
         var p = player_list[socket.id];
         player.time = 0;
         p.dx = data.dx;
         p.dy = data.dy;
     })
 
-    socket.on('gameover', function(data) {
-        exit_game(socket.id);
-    });
-
     socket.on('disconnect', function(data) {
         if (player_list[socket.id] != undefined)
-            exit_game(socket.id);
+            ptr.push(socket.id);
     });
 
 });
@@ -118,8 +117,21 @@ function move(x0, y0, x, y, dx, dy, pid) {
 }
 
 setInterval(function() {
-    for (var i in player_list) {
+    loop: for (var i in player_list) {
         var player = player_list[i];
+        for (var a = -2; a <= 2; a++) {
+            for (var b = -2; b <= 2; b++) {
+                var x = (player.x + a + BOARD_WIDTH)%BOARD_WIDTH,
+                    y = (player.y + b + BOARD_HEIGHT)%BOARD_HEIGHT;
+                if (board[x][y] != 0 && board[x][y] != -1 && board[x][y] != i &&
+                        player_list[board[x][y]].bx == x && player_list[board[x][y]].by == y &&
+                        player_list[board[x][y]].r >= Math.max(Math.abs(a), Math.abs(b))) {
+                    exit_game(i);
+                    socket_list[i].emit('gameover', {});
+                    continue loop;
+                }
+            }
+        }
         if (player.time <= 0) {
             var loop_box = board[(player.x - player.dx + BOARD_WIDTH) % BOARD_WIDTH]
                 [(player.y - player.dy + BOARD_HEIGHT) % BOARD_HEIGHT];
@@ -136,6 +148,12 @@ setInterval(function() {
                 player.lx = player.x - player.dx;
                 player.ly = player.y - player.dy;
                 player.time = tick - subtick;
+
+                // calculate radius
+                var d1 = Math.abs(player.x-player.bx), d2 = Math.abs(player.y-player.by);
+                if(d1 > BOARD_WIDTH/2) d1 = BOARD_WIDTH-d1;
+                if(d2 > BOARD_HEIGHT/2) d2 = BOARD_HEIGHT-d2;
+                player.r = Math.min(2, Math.max(d1, d2)-1);
             }
         } else
             player.time -= subtick;
@@ -143,11 +161,14 @@ setInterval(function() {
 
     var ps = {};
     for (var i in player_list) {
+        if(player_list[i] == undefined)
+            continue;
         ps[i] = {
             x: player_list[i].x,
             y: player_list[i].y,
             lx: player_list[i].lx,
             ly: player_list[i].ly,
+            r: player_list[i].r,
             t: player_list[i].time,
             color: player_list[i].color,
         };
@@ -164,5 +185,9 @@ setInterval(function() {
         });
     }
     boardDeltas = [];
+    for(i in ptr) {
+        exit_game(i);
+    }
+    ptr = [];
 
 }, subtick);
