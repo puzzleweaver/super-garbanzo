@@ -102,8 +102,6 @@ var render = function() {
 
     if (ps != undefined) {
 
-        console.log(ps[id].pk);
-
         set_cam(get_x(ps[id].x, id), get_y(ps[id].y, id));
 
         for (var i = 0; i < BOARD_WIDTH; i++) {
