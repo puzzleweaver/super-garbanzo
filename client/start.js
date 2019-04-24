@@ -24,6 +24,7 @@ socket.on('id', function(data) {
 
 socket.on('gameover', function(data) {
     document.getElementById('overlay-gameover').style.display = 'block';
+    document.getElementById('stats').innerHTML = "score: " + data.stats;
 });
 
 function start() {

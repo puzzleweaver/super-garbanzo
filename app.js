@@ -52,7 +52,7 @@ io.on('connection', function(socket) {
             return;
         var x, y;
         for(var attempt = 0; attempt < 100; attempt++) {
-            if(attmept == 99)
+            if(attempt == 99)
                 return;
             else {
                 x = Math.floor(Math.random() * BOARD_WIDTH);
@@ -137,9 +137,11 @@ setInterval(function() {
                 if (board[x][y] != 0 && board[x][y] != -1 && board[x][y] != i &&
                         player_list[board[x][y]].bx == x && player_list[board[x][y]].by == y &&
                         player_list[board[x][y]].r >= Math.max(Math.abs(a), Math.abs(b))) {
+                    socket_list[i].emit('gameover', {
+                        stats: player_list[i].pk,
+                    });
                     exit_game(i);
-                    socket_list[i].emit('gameover', {});
-                    player_list[board[x][y]].players_killed++;
+                    player_list[board[x][y]].pk++;
                     continue loop;
                 }
             }
@@ -182,7 +184,7 @@ setInterval(function() {
             r: player_list[i].r,
             t: player_list[i].time,
             color: player_list[i].color,
-            pk: player_list[i].players_killed,
+            pk: player_list[i].pk,
         };
     }
 

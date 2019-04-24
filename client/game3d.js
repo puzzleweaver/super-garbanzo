@@ -58,7 +58,7 @@ function init_gfx() {
     scene.add(light);
     numConstObjs++;
 
-    var map = new THREE.TextureLoader().load('client/gust.png');
+    var map = new THREE.TextureLoader().load('client/gust' + (Math.random() < 0.3 ? "2":"") + '.png');
     map.wrapS = map.wrapT = THREE.RepeatWrapping;
     var plane_geometry = new THREE.PlaneGeometry(BOARD_WIDTH, BOARD_HEIGHT, 10, 10);
     var plane_material = new THREE.MeshPhongMaterial({
@@ -101,6 +101,8 @@ var render = function() {
     }
 
     if (ps != undefined) {
+
+        console.log(ps[id].pk);
 
         set_cam(get_x(ps[id].x, id), get_y(ps[id].y, id));
 
