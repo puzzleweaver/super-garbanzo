@@ -127,11 +127,11 @@ var render = function() {
 
                 // if space is unowned box
                 if (board[i][j] == 0) {
-                    rbox.material = new THREE.MeshPhongMaterial({
+                    box.material = new THREE.MeshPhongMaterial({
                         color: 'white',
                     });
-                    rbox.position.set(x, y, 0);
-                    add(rbox);
+                    box.position.set(x, y, 0);
+                    add(box);
                 } else if (ps[board[i][j]] != undefined) {
                     // sphere
                     sphere.material = new THREE.MeshPhongMaterial({
