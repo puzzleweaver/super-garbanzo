@@ -50,11 +50,22 @@ io.on('connection', function(socket) {
     socket.on('start', function(data) {
         if(player_list[data.id] != undefined)
             return;
+        var x, y;
+        for(var attempt = 0; attempt < 100; attempt++) {
+            if(attmept == 99)
+                return;
+            else {
+                x = Math.floor(Math.random() * BOARD_WIDTH);
+                y = Math.floor(Math.random() * (BOARD_HEIGHT - 1));
+                if(board[x][y] == -1 && board[x][y+1] == -1)
+                    break;
+            }
+        }
         player_list[data.id] = new player(data.id,
-            Math.floor(Math.random() * BOARD_WIDTH), Math.floor(Math.random() * (BOARD_HEIGHT - 1)),
-            data.color);
-        setBoard(player_list[data.id].x, player_list[data.id].y, data.id);
-        setBoard(player_list[data.id].x, player_list[data.id].y + 1, data.id);
+        x, y,
+        data.color);
+        setBoard(x, y, data.id);
+        setBoard(x, y+1, data.id);
         socket.emit('board-init', {
             board: board,
             width: BOARD_WIDTH,
@@ -128,6 +139,7 @@ setInterval(function() {
                         player_list[board[x][y]].r >= Math.max(Math.abs(a), Math.abs(b))) {
                     exit_game(i);
                     socket_list[i].emit('gameover', {});
+                    player_list[board[x][y]].players_killed++;
                     continue loop;
                 }
             }
@@ -148,15 +160,14 @@ setInterval(function() {
                 player.lx = player.x - player.dx;
                 player.ly = player.y - player.dy;
                 player.time = tick - subtick;
-
-                // calculate radius
-                var d1 = Math.abs(player.x-player.bx), d2 = Math.abs(player.y-player.by);
-                if(d1 > BOARD_WIDTH/2) d1 = BOARD_WIDTH-d1;
-                if(d2 > BOARD_HEIGHT/2) d2 = BOARD_HEIGHT-d2;
-                player.r = Math.min(2, Math.max(d1, d2)-1);
             }
         } else
             player.time -= subtick;
+        // calculate radius
+        var d1 = Math.abs(player.x-player.bx), d2 = Math.abs(player.y-player.by);
+        if(d1 > BOARD_WIDTH/2) d1 = BOARD_WIDTH-d1;
+        if(d2 > BOARD_HEIGHT/2) d2 = BOARD_HEIGHT-d2;
+        player.r = Math.min(2, Math.max(d1, d2)-1);
     }
 
     var ps = {};
@@ -171,6 +182,7 @@ setInterval(function() {
             r: player_list[i].r,
             t: player_list[i].time,
             color: player_list[i].color,
+            pk: player_list[i].players_killed,
         };
     }
 

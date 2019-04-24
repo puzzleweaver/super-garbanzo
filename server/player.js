@@ -12,6 +12,7 @@ var Player = function(ID, X, Y, COLOR) {
         r: 0,
         color: COLOR,
         time: 0,
+        players_killed: 0,
     }
     return self;
 }
