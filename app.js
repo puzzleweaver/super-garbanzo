@@ -50,13 +50,13 @@ io.on('connection', function(socket) {
     socket.on('msg', function(data) {
       for (var i in socket_list) {
           socket_list[i].emit('msgs', {
-              id: data.id,
-              text: data.text,
+              text: data.id + ": " + data.text + "<br>",
           });
         }
     });
 
     socket.on('start', function(data) {
+        socket.emit("msgs", {text:logs});
         if(player_list[data.id] != undefined)
             return;
         var x, y;

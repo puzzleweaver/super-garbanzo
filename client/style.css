@@ -98,6 +98,9 @@ canvas {
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
 }
+#boxq {
+  border-style: solid;
+}
 
 button {
     background-color: hsl(var(--hue), 25%, 50%);
