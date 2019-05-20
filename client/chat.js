@@ -6,6 +6,12 @@ socket.on('msgs', function(data) {
     document.getElementById('box').innerHTML += data.id + ": " + data.text + "<br><br>";
 });
 
+id = "ANON";
+
+socket.on("id", function(data) {
+  id = data.id;
+})
+
 function start() {
     socket.emit('start', {
         id: id,
