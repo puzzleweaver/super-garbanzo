@@ -39,6 +39,8 @@ function exit_game(id) {
     delete player_list[id];
 }
 
+logs = "";
+
 io.on('connection', function(socket) {
 
     socket_list[socket.id] = socket;
@@ -48,9 +50,11 @@ io.on('connection', function(socket) {
     });
 
     socket.on('msg', function(data) {
+      message = data.id + ": " + data.text + "<br>";
+      logs += message;
       for (var i in socket_list) {
           socket_list[i].emit('msgs', {
-              text: data.id + ": " + data.text + "<br>",
+              text: message,
           });
         }
     });
