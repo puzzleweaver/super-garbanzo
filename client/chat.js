@@ -3,20 +3,17 @@
 var socket = io.connect('https://super-garbanzo.herokuapp.com/');
 
 socket.on('msgs', function(data) {
-    document.getElementById('boxq').innerHTML += data.text;
+    document.getElementById('boxq').innerHTML = data.text + document.getElementById('boxq').innerHTML;
 });
 
 id = "ANON";
 
 socket.on("id", function(data) {
   id = data.id;
+  socket.emit('start', {
+      id: id,
+  });
 });
-
-function start() {
-    socket.emit('start', {
-        id: id,
-    });
-}
 
 function send_msg() {
   socket.emit("msg", {
