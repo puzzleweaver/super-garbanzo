@@ -47,6 +47,15 @@ io.on('connection', function(socket) {
         tick: tick,
     });
 
+    socket.on('msg', function(data) {
+      for (var i in socket_list) {
+          socket_list[i].emit('msgs', {
+              id: data.id,
+              text: data.text,
+          });
+        }
+    });
+
     socket.on('start', function(data) {
         if(player_list[data.id] != undefined)
             return;
