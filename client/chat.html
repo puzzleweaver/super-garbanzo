@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="client/style.css">
+	<script src="https://cdn.socket.io/socket.io-1.7.3.js"></script>
+</head>
+<body>
+	<div id="spcr"></div>
+	<canvas id="cnvs"></canvas>
+	<div id="overlay-gameover" display="none">
+		<div id="box">
+			<br>You Died.<br>
+			<div id="stats"></div>
+			<button id="btn" onclick="restart()">Start Again</button><br>
+		</div>
+	</div>
+	<div id="overlay-start" display="block">
+		<div id="box">
+			<br>Super-Garbanzo<br>
+			<button id="btn" onclick="start()">Start Game</button><br>
+			<input id="color_slider" type="range" min="0" max="360" value="180"
+					class="slider" oninput="color_slider()">
+		</div>
+	</div>
+	<!-- <div id="overlay-game-over" display="none">
+		<div id="box1">
+			<br><br>Super-Garbanzo<br>
+			<button id="btn1" onclick="start()">Start Game</button>
+		</div>
+	</div> -->
+</body>
+
+<script src="client/start.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/103/three.js"></script>
+<script src="client/d3.v3.min.js"></script>
+<script src="client/three-extras.js"></script>
+<script src="client/game3d.js"></script>
+
+</html>
