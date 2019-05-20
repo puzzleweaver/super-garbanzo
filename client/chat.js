@@ -12,7 +12,7 @@ function start() {
     });
 }
 
-var send_msg() {
+function send_msg() {
   socket.emit("msg", {
     id:id,
     text:document.getElementById('text-input').value,
