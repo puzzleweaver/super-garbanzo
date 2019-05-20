@@ -50,7 +50,7 @@ io.on('connection', function(socket) {
     });
 
     socket.on('msg', function(data) {
-      message = (data.id+"").substring(0, 4) + ": " + data.text + "<br>";
+      message = (data.id+"").substring(0, 4) + ": " + data.text + "<br><br>";
       logs = message + logs;
       for (var i in socket_list) {
           socket_list[i].emit('msgs', {
