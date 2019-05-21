@@ -23,6 +23,7 @@ function send_msg() {
   socket.emit("msg", {
     id:id,
     text:document.getElementById('text-input').value,
+    name:document.getElementById('name-input').value,
   });
   document.getElementById('text-input').value = "";
 }
