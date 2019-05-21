@@ -6,6 +6,10 @@ socket.on('msgs', function(data) {
     document.getElementById('boxq').innerHTML = data.text + document.getElementById('boxq').innerHTML;
 });
 
+socket.on('msgsr', function(data) {
+    document.getElementById('boxq').innerHTML = data.text;
+});
+
 id = "ANON";
 
 socket.on("id", function(data) {

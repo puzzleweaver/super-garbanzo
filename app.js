@@ -51,6 +51,11 @@ io.on('connection', function(socket) {
 
     socket.on('reset', function(data) {
         logs = "------ Reset by " + socket.id.substring(0, 4) + " ------<br><br>";
+        for (var i in socket_list) {
+            socket_list[i].emit('msgsr', {
+                text: logs,
+            });
+        }
     });
 
     socket.on('msg', function(data) {
