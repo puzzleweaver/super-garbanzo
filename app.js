@@ -49,6 +49,10 @@ io.on('connection', function(socket) {
         tick: tick,
     });
 
+    socket.on('reset', function(data) {
+        logs = "------ Reset by " + socket.id.substring(0, 4) + " ------<br><br>";
+    });
+
     socket.on('msg', function(data) {
       message = (data.id+"").substring(0, 4) + ": " + data.text + "<br><br>";
       logs = message + logs;

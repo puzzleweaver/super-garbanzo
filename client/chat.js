@@ -15,6 +15,10 @@ socket.on("id", function(data) {
   });
 });
 
+function reset() {
+  socket.emit("reset", {});
+}
+
 function send_msg() {
   socket.emit("msg", {
     id:id,
